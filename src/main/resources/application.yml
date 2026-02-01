@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: qna-ai
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/ai_qna?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 12345678
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data.sql
+
+  ai:
+    ollama:
+      base-url: https://hbhqtdjh6507rm-11434.proxy.runpod.net/
+      chat:
+        model: gemma3:4b
+      embedding:
+        model: all-minilm
+
+    vectorstore:
+      chroma:
+        client:
+          host: localhost
+          port: 8000
+        collection-name: qna_embeddings
+        initialize-schema: true
+
+logging:
+  level:
+    kr.yonggeon.qnaai: DEBUG
+    org.springframework.ai: DEBUG
