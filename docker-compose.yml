@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: qna-mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "12345678"
+      MYSQL_DATABASE: ai_qna
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   chroma:
     image: chromadb/chroma:latest
     container_name: qna-chroma
@@ -18,5 +36,7 @@ services:
       retries: 5
 
 volumes:
+  mariadb-data:
+    driver: local
   chroma-data:
     driver: local
