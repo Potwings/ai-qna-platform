@@ -29,7 +29,8 @@ public class QuestionController {
     private final RagService ragService;
 
     /**
-     * 질문 생성 + AI 자동 답변
+     * 질문 생성 + AI 자동 답변 (비동기)
+     * 질문은 즉시 반환되고, AI 답변은 백그라운드에서 생성됩니다.
      */
     @PostMapping
     public ResponseEntity<QuestionResponse> createQuestion(@Valid @RequestBody QuestionRequest request) {
@@ -42,12 +43,13 @@ public class QuestionController {
                 request.getUserName()
         );
 
-        // AI 자동 답변 생성
-        Answer aiAnswer = ragService.generateAnswer(question);
+        // AI 자동 답변 비동기 생성 (백그라운드에서 처리)
+        ragService.generateAnswerAsync(question);
+        log.info("Question created with ID: {}, AI answer generation started in background", question.getId());
 
-        // 응답 반환 (질문 + AI 답변 포함)
-        QuestionResponse response = QuestionResponse.from(question, aiAnswer);
-        log.info("Question created with ID: {}, AI answer ID: {}", question.getId(), aiAnswer.getId());
+        // 응답 반환 (질문만 반환, 답변은 나중에 생성됨)
+        QuestionResponse response = QuestionResponse.from(question);
+        response.setAnswerCount(0L);
 
         return ResponseEntity.ok(response);
     }

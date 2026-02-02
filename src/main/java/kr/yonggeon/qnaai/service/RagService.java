@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,17 @@ public class RagService {
     private final VectorStoreService vectorStoreService;
     private final AnswerService answerService;
     private final EmbeddingService embeddingService;
+
+    /**
+     * 비동기로 AI 답변 생성 (질문 생성 후 백그라운드에서 처리)
+     */
+    @Async("aiAnswerExecutor")
+    @Transactional
+    public CompletableFuture<Answer> generateAnswerAsync(Question question) {
+        log.info("Starting async AI answer generation for Question ID: {}", question.getId());
+        Answer answer = generateAnswer(question);
+        return CompletableFuture.completedFuture(answer);
+    }
 
     @Transactional
     public Answer generateAnswer(Question question) {
