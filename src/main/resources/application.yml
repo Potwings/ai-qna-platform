@@ -25,17 +25,19 @@ spring:
 
   ai:
     ollama:
-      base-url: https://hbhqtdjh6507rm-11434.proxy.runpod.net/
+      base-url: https://nl40xespyqfxhj-11434.proxy.runpod.net/
       chat:
         model: gemma3:4b
       embedding:
-        model: all-minilm
+        model: nomic-embed-text
 
     vectorstore:
       chroma:
         client:
           host: localhost
           port: 8000
+        tenant-name: default_tenant
+        database-name: default_database
         collection-name: qna_embeddings
         initialize-schema: true
 
